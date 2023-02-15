@@ -1,32 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Wwbm</title>
+  <title>MillionerGame</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
-
   <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
   <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
-
-
-  <%= stylesheet_link_tag 'application', :media => 'all' %>
-
-  <%= javascript_include_tag 'application' %>
-
 </head>
-
 <body>
-
 
 <div class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
   <div class="container">
-    <%= link_to 'Billionaire', root_path, class: 'navbar-brand' %>
+    <%= link_to 'Millioner', root_path, class: 'navbar-brand' %>
     <% if user_signed_in? %>
       <div class="navbar-form navbar-right">
 
         <% if current_user.is_admin? %>
-          <%# Ссылка на админку %>
           <%= link_to 'Админка', rails_admin_path, class: 'btn navbar-btn btn-danger btn-xs' %>
           <%= link_to 'Залить новые вопросы', new_questions_path, class: 'btn navbar-btn btn-warning btn-xs' %>
         <% end %>
@@ -37,7 +27,9 @@
                     class: 'btn btn-outline-light btn-sm me-2'
         %>
         <%= link_to 'Новая игра', games_path, data: { turbo_method: "post" }, class: 'btn btn-success btn-sm me-2' %>
-        <%= link_to 'Выйти', destroy_user_session_path, data: { turbo_method: "delete" }, class: 'btn btn-info btn-sm' %>
+        <li class="nav-item">
+          <%= button_to t(".exit"), destroy_user_session_path, method: :delete, data: { turbo: false }, class: "nav-link active btn btn-link" %>
+        </li>
       </div>
     <% else %>
       <div class="navbar-form navbar-right">
@@ -56,7 +48,7 @@
   </div>
 
   <footer class="buffer-top-lg text-right">
-    <p>&copy; <%= link_to 'Хороший программист', 'http://bit.ly/1U2DVdI' %> 2016 &mdash; &infin;</p>
+    <p>&copy; <%= link_to 'Vladisal Fedotov', 'http://bit.ly/1U2DVdI' %> 2016 &mdash; &infin;</p>
   </footer>
 </div>
 <%#= yield %>

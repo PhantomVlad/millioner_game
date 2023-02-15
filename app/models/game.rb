@@ -46,6 +46,7 @@ class Game < ApplicationRecord
         ans = [1, 2, 3, 4]
         game.game_questions.create!(question: q, a: ans.shuffle!.pop, b: ans.shuffle!.pop, c: ans.shuffle!.pop, d: ans.shuffle!.pop)
       end
+      debugger
       game
     end
   end
