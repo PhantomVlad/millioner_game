@@ -4,7 +4,6 @@ class GameQuestion < ApplicationRecord
 
   belongs_to :game
 
-  # вопрос из которого берется вся информация
   belongs_to :question
 
   # создаем в этой модели виртуальные геттеры text, level, значения которых

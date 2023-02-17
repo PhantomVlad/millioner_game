@@ -1,10 +1,12 @@
 FactoryBot.define do
   factory :question do
-    level { 1 }
-    text { "MyText" }
-    answer1 { "MyString" }
-    answer2 { "MyString" }
-    answer3 { "MyString" }
-    answer4 { "MyString" }
+    answer1 { "#{rand(2001)}" }
+    answer2 { "#{rand(2001)}" }
+    answer3 { "#{rand(2001)}" }
+    answer4 { "#{rand(2001)}" }
+
+    sequence(:text) {|n| "В каком году была косм. одиссея #{n}"}
+
+    sequence(:level) {|n| n % 15 }
   end
 end

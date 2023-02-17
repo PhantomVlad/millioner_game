@@ -17,12 +17,12 @@ gem "stimulus-rails"
 gem "cssbundling-rails"
 gem "bootsnap", require: false
 gem "tzinfo-data", platforms: %i[ mingw mswin x64_mingw jruby ]
+gem "sqlite3"
 
 group :development, :test do
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
   gem "rspec-rails"
   gem "factory_bot_rails"
-  gem "sqlite3"
   gem 'rails-controller-testing'
 end
 
@@ -31,8 +31,5 @@ group :development do
 end
 
 group :test do
-end
-
-group :production do
-  gem "pg", "~> 1.1"
+  gem 'shoulda-matchers', '~> 5.0'
 end
