@@ -1,4 +1,11 @@
 ru:
+  activerecord:
+    attributes:
+      user:
+        email: "Email"
+        name: "Имя"
+        password: "Пароль"
+        password_confirmation: "Подтверждение пароля"
   game_help:
     friends:
       - "Жора"
@@ -9,7 +16,6 @@ ru:
       - "Александр Друзь"
       - "Сережа"
     friend_call: "%{name} считает, что это вариант %{variant}"
-
   controllers:
     games:
       not_your_game: "Это не ваша игра!"
@@ -22,19 +28,44 @@ ru:
       game_closed: "Игра %{game_id} закончена и больше недоступна, начните новую!"
       good_answer: "Правильный ответ, молодцом :)"
       bad_answer: "Правильный ответ: %{answer}. Игра закончена, ваш приз %{prize}"
-
-# статусы игры
+  # статусы игры
   game_statuses:
     fail: 'проигрыш'
     timeout: 'время'
     money: 'деньги'
     won: 'победа'
     in_progress: 'в процессе'
-
   number:
     currency:
       format:
         # Формат отображения валюты и обозначение самой валюты
         unit: "₽"
         precision: 0
-
+  app:
+    name: "Billionaire"
+  error:
+    one: "%{count} ошибка"
+    few: "%{count} ошибки"
+    many: "%{count} ошибок"
+  link:
+    edit_password: "Сменить пароль"
+    back: "вернуться"
+    profile: "Профиль"
+    log_out: "Выйти"
+    log_in: "Войти"
+    sign_in: "Зарегистрироваться"
+    forgot_password: "Забыли пароль?"
+    change_password: "Сменить пароль"
+  button:
+    sign_in: "Зарегистрироваться"
+    edit_user: "Редактировать профиль"
+    save: "Сохранить"
+    delete: "Удалить"
+    send_instruction: "Выслать инструкцию по восстановлению"
+    send: "Отправить"
+  turbo:
+    confirm: "Вы уверены?"
+  admin:
+    actions:
+      dashboard:
+        title: "Администратирование"

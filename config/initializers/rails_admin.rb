@@ -1,6 +1,6 @@
 RailsAdmin.config do |config|
   config.asset_source = :webpack
-
+  config.parent_controller = '::RailsAdminAbstractController'
   ### Popular gems integration
 
   ## == Devise ==
