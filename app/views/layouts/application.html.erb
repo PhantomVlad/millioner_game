@@ -27,9 +27,9 @@
                     class: 'btn btn-outline-light btn-sm me-2'
         %>
         <%= link_to 'Новая игра', games_path, data: { turbo_method: "post" }, class: 'btn btn-success btn-sm me-2' %>
-        <li class="nav-item">
-          <%= button_to t(".exit"), destroy_user_session_path, method: :delete, data: { turbo: false }, class: "nav-link active btn btn-link" %>
-        </li>
+        <span>
+          <%= link_to "Выход", destroy_user_session_path, data: { "turbo-method" => :delet }, class: 'btn btn-danger btn-sm me-2' %>
+        </span>
       </div>
     <% else %>
       <div class="navbar-form navbar-right">
@@ -41,14 +41,23 @@
 </div>
 
 <div class="container">
-  <div class="row">
-    <div class="col-lg-12">
-      <%= yield %>
+  <% if notice %>
+    <div class="alert alert-success alert-dismissible fade show">
+      <%= notice %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-  </div>
+  <% end %>
+  <% if alert %>
+    <div class="alert alert-danger alert-dismissible fade show">
+      <%= alert %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% end %>
+
+  <%= yield %>
 
   <footer class="buffer-top-lg text-right">
-    <p>&copy; <%= link_to 'Vladisal Fedotov', 'http://bit.ly/1U2DVdI' %> 2016 &mdash; &infin;</p>
+    <p>&copy; <%= link_to 'Vladislav Fedotov', 'https://github.com/PhantomVlad' %> 2023</p>
   </footer>
 </div>
 <%#= yield %>
