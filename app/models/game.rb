@@ -40,7 +40,6 @@ class Game < ApplicationRecord
   end
 
   def previous_game_question
-    # с помощью ruby метода detect находим в массиве game_questions нужный вопрос
     game_questions.detect { |q| q.question.level == previous_level }
   end
 

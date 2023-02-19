@@ -39,7 +39,6 @@ RSpec.describe Game, type: :model do
     end
 
     it 'take_money! finishes the game' do
-
       q = game_w_questions.current_game_question
       game_w_questions.answer_current_question!(q.correct_answer_key)
 
@@ -51,6 +50,14 @@ RSpec.describe Game, type: :model do
       expect(game_w_questions.status).to eq :money
       expect(game_w_questions.finished?).to be_truthy
       expect(user.balance).to eq prize
+    end
+
+    it ".current_game_question" do
+      expect(game_w_questions.current_game_question).to eq(game_w_questions.game_questions[0])
+    end
+
+    it ".previous_level" do
+      expect(game_w_questions.previous_level).to be(-1)
     end
   end
 
