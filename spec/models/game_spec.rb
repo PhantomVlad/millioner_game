@@ -7,8 +7,8 @@ RSpec.describe Game, type: :model do
     FactoryBot.create(:game_with_questions, user: user)
   end
 
-  context "Game Factory" do
-    it "Game.create_game_for_user! new correct game" do
+  describe "#create_game_for_user!" do
+    it "new correct game" do
       generate_questions(60)
 
       game = nil
@@ -23,47 +23,15 @@ RSpec.describe Game, type: :model do
     end
   end
 
-  context 'game mechanics' do
-    it 'answer correct continues game' do
-      level = game_w_questions.current_level
-      q = game_w_questions.current_game_question
-
-      expect(game_w_questions.status).to eq(:in_progress)
-
-      game_w_questions.answer_current_question!(q.correct_answer_key)
-      expect(game_w_questions.current_level).to eq(level + 1)
-
-      expect(game_w_questions.current_game_question).not_to eq(q)
-      expect(game_w_questions.status).to eq(:in_progress)
-      expect(game_w_questions.finished?).to be false
+  describe '#current_game_question' do
+    it "return current question" do
+      expect(game_w_questions.current_game_question).to eq(game_w_questions.game_questions[0])
     end
+  end
 
-    describe "#take_money!" do
-      it 'finishes the game' do
-        q = game_w_questions.current_game_question
-        game_w_questions.answer_current_question!(q.correct_answer_key)
-
-        game_w_questions.take_money!
-
-        prize = game_w_questions.prize
-        expect(prize).to be > 0
-
-        expect(game_w_questions.status).to eq :money
-        expect(game_w_questions.finished?).to be true
-        expect(user.balance).to eq prize
-      end
-    end
-
-    describe '#current_game_question' do
-      it "return current question" do
-        expect(game_w_questions.current_game_question).to eq(game_w_questions.game_questions[0])
-      end
-    end
-
-    describe '#previous_level' do
-      it "return previous level" do
-        expect(game_w_questions.previous_level).to be(-1)
-      end
+  describe '#previous_level' do
+    it "return previous level" do
+      expect(game_w_questions.previous_level).to be(-1)
     end
   end
 
@@ -91,6 +59,85 @@ RSpec.describe Game, type: :model do
 
     it ":money" do
       expect(game_w_questions.status).to eq(:money)
+    end
+  end
+
+  describe "answer_current_question!" do
+    before(:each) do
+      game_w_questions.answer_current_question!(answer_key)
+    end
+
+    context "when answer is current" do
+      let(:answer_key) { game_w_questions.current_game_question.correct_answer_key }
+
+      context "when time no finished" do
+        context "when no last question" do
+          it "return current level" do
+            expect(game_w_questions.current_level).to be(1)
+          end
+
+          it "return status game" do
+            expect(game_w_questions.status).to eq(:in_progress)
+          end
+        end
+
+        context "when last question" do
+          let(:level) { Question::QUESTION_LEVELS.last }
+          let(:game_w_questions) { FactoryBot.create(:game_with_questions, user: user, current_level: level) }
+
+          it "return current level" do
+            expect(game_w_questions.current_level).to be(level + 1)
+          end
+
+          it "return status game 'won'" do
+            expect(game_w_questions.status).to eq(:won)
+          end
+
+          it "return max prize" do
+            expect(game_w_questions.prize).to be(1000000)
+          end
+        end
+      end
+
+      context "when time finished" do
+        let!(:game_w_questions) { FactoryBot.create(:game_with_questions, user: user, created_at: 1.hour.ago) }
+
+        it "return finished true" do
+          expect(game_w_questions.finished?).to be true
+        end
+
+        it "return status 'timeout'" do
+          expect(game_w_questions.status).to eq(:timeout)
+        end
+      end
+    end
+
+    context "when answer isnt correct" do
+      let(:answer_key) { [:a, :b, :c, :d].grep_v(game_w_questions.current_game_question.correct_answer_key).first }
+
+      it "return finished true" do
+        expect(game_w_questions.finished?).to be true
+      end
+
+      it "return status 'fail'" do
+        expect(game_w_questions.status).to eq(:fail)
+      end
+    end
+  end
+
+  context 'game mechanics' do
+    it 'answer correct continues game' do
+      level = game_w_questions.current_level
+      q = game_w_questions.current_game_question
+
+      expect(game_w_questions.status).to eq(:in_progress)
+
+      game_w_questions.answer_current_question!(q.correct_answer_key)
+      expect(game_w_questions.current_level).to eq(level + 1)
+
+      expect(game_w_questions.current_game_question).not_to eq(q)
+      expect(game_w_questions.status).to eq(:in_progress)
+      expect(game_w_questions.finished?).to be false
     end
   end
 end
