@@ -6,34 +6,14 @@ class GameQuestion < ApplicationRecord
 
   belongs_to :question
 
-  # создаем в этой модели виртуальные геттеры text, level, значения которых
-  # автоматически берутся из связанной модели question
   delegate :text, :level, to: :question, allow_nil: true
 
-  # без игры и вопроса - игровой вопрос не имеет смысла
   validates :game, :question, presence: true
 
-  # в полях a,b,c,d прячутся индексы ответов из объекта :game
   validates :a, :b, :c, :d, inclusion: {in: 1..4}
 
-  # Автоматическая сериализация поля в базу (мы юзаем как обычный хэш,
-  # а рельсы в базе хранят как строчку)
-  # см. ссылки в материалах урока
   serialize :help_hash, Hash
 
-  # help_hash у нас имеет такой формат:
-  # {
-  #   fifty_fifty: ['a', 'b'], # При использовании подсказски остались варианты a и b
-  #   audience_help: {'a' => 42, 'c' => 37 ...}, # Распределение голосов по вариантам a, b, c, d
-  #   friend_call: 'Василий Петрович считает, что правильный ответ A'
-  # }
-  #
-
-
-  # ----- Основные методы для доступа к данным в шаблонах и контроллерах -----------
-
-  # Возвращает хэш, отсортированный по ключам:
-  # {'a' => 'Текст ответа Х', 'b' => 'Текст ответа У', ... }
   def variants
     {
       'a' => question.read_attribute("answer#{a}"),
@@ -43,23 +23,18 @@ class GameQuestion < ApplicationRecord
     }
   end
 
-  # Возвращает истину, если переданная буква (строка или символ) содержит верный ответ
   def answer_correct?(letter)
     correct_answer_key == letter.to_s.downcase
   end
 
-  # ключ правильного ответа 'a', 'b', 'c', или 'd'
   def correct_answer_key
     {a => 'a', b => 'b', c => 'c', d => 'd'}[1]
   end
 
-  # текст правильного ответа
   def correct_answer
     variants[correct_answer_key]
   end
 
-  # Добавляем в help_hash по ключю fifty_fifty - массив из двух вариантов: правильный и случайный
-  # и сохраняем объект
   def add_fifty_fifty
     self.help_hash[:fifty_fifty] = [
       correct_answer_key,
@@ -68,7 +43,6 @@ class GameQuestion < ApplicationRecord
     save
   end
 
-  # Генерируем в help_hash случайное распределение по вариантам и сохраняем объект
   def add_audience_help
     # массив ключей
     keys_to_use = keys_to_use_in_help
@@ -76,7 +50,6 @@ class GameQuestion < ApplicationRecord
     save
   end
 
-  # Добавляем в help_hash подсказку друга и сохраняем объект
   def add_friend_call
     # массив ключей
     keys_to_use = keys_to_use_in_help
@@ -86,7 +59,6 @@ class GameQuestion < ApplicationRecord
 
   private
 
-  # Рассчитываем какие ключи нам доступны в подсказках
   def keys_to_use_in_help
     keys_to_use = variants.keys
     # Учитываем наличие подсказки 50/50
