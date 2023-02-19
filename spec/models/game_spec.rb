@@ -8,7 +8,7 @@ RSpec.describe Game, type: :model do
   end
 
   context "Game Factory" do
-    it "Game.create_game_for_user! new cprrect game" do
+    it "Game.create_game_for_user! new correct game" do
       generate_questions(60)
 
       game = nil
@@ -35,7 +35,7 @@ RSpec.describe Game, type: :model do
 
       expect(game_w_questions.current_game_question).not_to eq(q)
       expect(game_w_questions.status).to eq(:in_progress)
-      expect(game_w_questions.finished?).to be_falsey
+      expect(game_w_questions.finished?).to be false
     end
 
     describe "#take_money!" do
@@ -49,7 +49,7 @@ RSpec.describe Game, type: :model do
         expect(prize).to be > 0
 
         expect(game_w_questions.status).to eq :money
-        expect(game_w_questions.finished?).to be_truthy
+        expect(game_w_questions.finished?).to be true
         expect(user.balance).to eq prize
       end
     end
@@ -70,7 +70,7 @@ RSpec.describe Game, type: :model do
   describe "#status" do
     before(:each) do
       game_w_questions.finished_at = Time.now
-      expect(game_w_questions.finished?).to be_truthy
+      expect(game_w_questions.finished?).to be true
     end
 
     it ":fail" do
