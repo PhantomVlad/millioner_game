@@ -6,33 +6,20 @@ RSpec.describe Game, type: :model do
   let(:game_w_questions) do
     FactoryBot.create(:game_with_questions, user: user)
   end
+  
+  let(:q) { game_w_questions.current_game_question }
 
-  describe "#create_game_for_user!" do
-    context "new correct game" do
+  context 'Game Factory' do
+    it 'Game.create_game! new correct game' do
       generate_questions(60)
+
       game = nil
 
-      it "return model game" do
-        expect {
-          game = Game.create_game_for_user!(user)
-        }.to change(Game, :count).by(1).and(change(GameQuestion, :count).by(15))
-      end
-
-      it "return user" do
-        expect(game.user).to eq(user)
-      end
-
-      it "return status in progress" do
-        expect(game.status).to eq(:in_progress)
-      end
-
-      it "return game_questions.size 15" do
-        expect(game.game_questions.size).to eq(15)
-      end
-
-      it "return array levels" do
-        expect(game.game_questions.map(&:level)).to eq (0..14).to_a
-      end
+      expect { game = Game.create_game_for_user!(user) }.to change(Game, :count).by(1)
+      expect(game.user).to eq(user)
+      expect(game.status).to eq(:in_progress)
+      expect(game.game_questions.size).to eq(15)
+      expect(game.game_questions.map(&:level)).to eq (0..14).to_a
     end
   end
 
@@ -138,31 +125,18 @@ RSpec.describe Game, type: :model do
     end
   end
 
-  context "game mechanics" do
-    context "answer correct continues game" do
+  context 'game mechanics' do
+    it 'answer correct continues game' do
       level = game_w_questions.current_level
-      q = game_w_questions.current_game_question
+      expect(game_w_questions.status).to eq(:in_progress)
 
-      it "return game status in progress" do
-        expect(game_w_questions.status).to eq(:in_progress)
-      end
+      game_w_questions.answer_current_question!(q.correct_answer_key)
 
-      it "return correct level when answer correct" do
-        game_w_questions.answer_current_question!(q.correct_answer_key)
-        expect(game_w_questions.current_level).to eq(level + 1)
-      end
-
-      it "return correct game question no last question" do
-        expect(game_w_questions.current_game_question).not_to eq(q)
-      end
-
-      it "return correct game status in progress" do
-        expect(game_w_questions.status).to eq(:in_progress)
-      end
-
-      it "return finished false" do
-        expect(game_w_questions.finished?).to be false
-      end
+      expect(game_w_questions.current_level).to eq(level + 1)
+      expect(game_w_questions.previous_game_question).to eq(q)
+      expect(game_w_questions.current_game_question).not_to eq(q)
+      expect(game_w_questions.status).to eq(:in_progress)
+      expect(game_w_questions.finished?).to be_falsey
     end
   end
 end

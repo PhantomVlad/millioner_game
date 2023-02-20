@@ -5,27 +5,42 @@ RSpec.describe GamesController, type: :controller do
   let(:user) { FactoryBot.create(:user) }
   let(:admin) { FactoryBot.create(:user, is_admin: true) }
   let(:game_w_questions) { FactoryBot.create(:game_with_questions, user: user) }
+  let(:game) { assigns(:game) }
 
   describe "#show" do
     context "user anon" do
-      it "kicks anon" do
-        get :show, params: { id: game_w_questions.id }
+      before { get :show, params: { id: game_w_questions.id } }
+
+      it "return correct html status" do
         expect(response.status).not_to eq(200)
+      end
+
+      it "correct redirect to new_user" do
         expect(response).to redirect_to(new_user_session_path)
+      end
+
+      it "return alert in flash" do
         expect(flash[:alert]).to be
       end
     end
 
     context "user sign_in" do
       before(:each) { sign_in user }
+      before { get :show, params: { id: game_w_questions.id } }
 
-      it "show game" do
-        get :show, params: {id: game_w_questions.id}
-        game = assigns(:game)
+      it "game no finished" do
+        expect(game.finished?).to be false
+      end
 
-        expect(game.finished?).to be_falsey
+      it "return correct user" do
         expect(game.user).to eq(user)
+      end
+
+      it "return html status 200" do
         expect(response.status).to eq(200)
+      end
+
+      it "render correct show" do
         expect(response).to render_template('show')
       end
     end
@@ -35,17 +50,25 @@ RSpec.describe GamesController, type: :controller do
     context "user sign_in" do
       before(:each) { sign_in user }
 
-      it "creates game" do
-        generate_questions(15)
+      context 'and creating game' do
+        before { generate_questions(15) }
+        before { post :create }
 
-        post :create
+        it 'game is not finished' do
+          expect(game.finished?).to be false
+        end
 
-        game = assigns(:game)
+        it 'assigns user to game' do
+          expect(game.user).to eq(user)
+        end
 
-        expect(game.finished?).to be_falsey
-        expect(game.user).to eq(user)
-        expect(response).to redirect_to(game_path(game))
-        expect(flash[:notice]).to be
+        it 'redirects to game path' do
+          expect(response).to redirect_to(game_path(game))
+        end
+
+        it 'renders flash notice' do
+          expect(flash[:notice]).to be
+        end
       end
     end
   end
