@@ -21,18 +21,22 @@ RSpec.describe GameQuestion, type: :model do
     end
   end
 
-  describe "correct #level & #text" do
-    it 'return correct .level & .text' do
+  describe "#level" do
+    it 'return correct .text' do
       expect(game_question.text).to eq(game_question.question.text)
+
+    end
+  end
+
+  describe "#text" do
+    it 'return correct .level' do
       expect(game_question.level).to eq(game_question.question.level)
     end
   end
 
-  context "game_question mechanics" do
-    describe "#correct_answer_key" do
-      it "correct .correct_answer_key" do
-        expect(game_question.correct_answer_key).to eq("b")
-      end
+  describe "#correct_answer_key" do
+    it "return correct .correct_answer_key" do
+      expect(game_question.correct_answer_key).to eq("b")
     end
   end
 end
