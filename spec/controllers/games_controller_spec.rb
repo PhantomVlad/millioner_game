@@ -136,6 +136,16 @@ RSpec.describe GamesController, type: :controller do
         expect(response).to redirect_to(game_path(game))
         expect(flash.empty?).to be true
       end
+
+      it "return answer no correct" do
+        put :answer, params: { id: game_w_questions.id, letter: [:a, :b, :c, :d].grep_v(game_w_questions.current_game_question.correct_answer_key).first }
+        game = assigns(:game)
+
+        expect(game.finished?).to be true
+        expect(game.current_level).to be  0
+        expect(response).to redirect_to(user_path(user))
+        expect(flash.empty?).to be false
+      end
     end
 
     context "user not sign_in" do
