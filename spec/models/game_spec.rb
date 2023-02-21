@@ -6,7 +6,7 @@ RSpec.describe Game, type: :model do
   let(:game_w_questions) do
     FactoryBot.create(:game_with_questions, user: user)
   end
-  
+
   let(:q) { game_w_questions.current_game_question }
 
   context 'Game Factory' do
@@ -41,23 +41,23 @@ RSpec.describe Game, type: :model do
       expect(game_w_questions.finished?).to be true
     end
 
-    it ":fail" do
+    it "return status :fail" do
       game_w_questions.is_failed = true
       expect(game_w_questions.status).to eq(:fail)
     end
 
-    it ":timeout" do
+    it "return status :timeout" do
       game_w_questions.is_failed = true
       game_w_questions.created_at = 1.hour.ago
       expect(game_w_questions.status).to eq(:timeout)
     end
 
-    it ":won" do
+    it "return status :won" do
       game_w_questions.current_level = Question::QUESTION_LEVELS.max + 1
       expect(game_w_questions.status).to eq(:won)
     end
 
-    it ":money" do
+    it "return status :money" do
       expect(game_w_questions.status).to eq(:money)
     end
   end
