@@ -22,6 +22,16 @@ RSpec.describe GamesController, type: :controller do
       it "return alert in flash" do
         expect(flash[:alert]).to be
       end
+
+      it "alien game" do
+        alien_game = FactoryBot.create(:game_with_questions)
+
+        get :show, params: { id: alien_game.id }
+
+        expect(response.status).not_to eq(200)
+        expect(response).to redirect_to(new_user_session_path)
+        expect(flash[:alert]).to be
+      end
     end
 
     context "user sign_in" do
@@ -43,6 +53,16 @@ RSpec.describe GamesController, type: :controller do
       it "render correct show" do
         expect(response).to render_template('show')
       end
+
+      it "alien game" do
+        alien_game = FactoryBot.create(:game_with_questions)
+
+        get :show, params: { id: alien_game.id }
+
+        expect(response.status).not_to eq(200)
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to be
+      end
     end
   end
 
@@ -50,25 +70,55 @@ RSpec.describe GamesController, type: :controller do
     context "user sign_in" do
       before(:each) { sign_in user }
 
-      context 'and creating game' do
+      context "creating game" do
         before { generate_questions(15) }
         before { post :create }
 
-        it 'game is not finished' do
+        it "game is not finished" do
           expect(game.finished?).to be false
         end
 
-        it 'assigns user to game' do
+        it "assigns user to game" do
           expect(game.user).to eq(user)
         end
 
-        it 'redirects to game path' do
+        it "redirects to game path" do
           expect(response).to redirect_to(game_path(game))
         end
 
-        it 'renders flash notice' do
+        it "renders flash notice" do
           expect(flash[:notice]).to be
         end
+      end
+
+      context "one more game is not finished" do
+        it "try to create second game" do
+          expect(game_w_questions.finished?).to be_falsey
+          expect { post :create }.to change(Game, :count).by(0)
+
+          game = assigns(:game)
+          expect(game).to be_nil
+
+          expect(response).to redirect_to(game_path(game_w_questions))
+          expect(flash[:alert]).to be
+        end
+      end
+    end
+
+    context "user not sign_in" do
+      before { generate_questions(15) }
+      before { post :create }
+
+      it "return correct html status" do
+        expect(response.status).not_to eq(200)
+      end
+
+      it "correct redirect to new_user" do
+        expect(response).to redirect_to(new_user_session_path)
+      end
+
+      it "return alert in flash" do
+        expect(flash[:alert]).to be
       end
     end
   end
@@ -81,10 +131,62 @@ RSpec.describe GamesController, type: :controller do
         put :answer, params: { id: game_w_questions.id, letter: game_w_questions.current_game_question.correct_answer_key }
         game = assigns(:game)
 
-        expect(game.finished?).to be_falsey
+        expect(game.finished?).to be false
         expect(game.current_level).to be > 0
         expect(response).to redirect_to(game_path(game))
-        expect(flash.empty?).to be_truthy
+        expect(flash.empty?).to be true
+      end
+    end
+
+    context "user not sign_in" do
+      before { put :answer, params: { id: game_w_questions.id, letter: game_w_questions.current_game_question.correct_answer_key } }
+      it "return correct html status" do
+        expect(response.status).not_to eq(200)
+      end
+
+      it "correct redirect to new_user" do
+        expect(response).to redirect_to(new_user_session_path)
+      end
+
+      it "renders alert in flash" do
+        expect(flash[:alert]).to be
+      end
+    end
+  end
+
+  describe "#take_money" do
+    context "user sign_in" do
+      before(:each) { sign_in user }
+
+      context "game isnt finished" do
+        it "return correct params, redirect and flash" do
+          game_w_questions.update_attribute(:current_level, 2)
+
+          put :take_money, params: { id: game_w_questions.id }
+
+          expect(game.finished?).to be_truthy
+          expect(game.prize).to eq(200)
+
+          user.reload
+          expect(user.balance).to eq(200)
+          expect(response).to redirect_to(user_path(user))
+          expect(flash[:warning]).to be
+        end
+      end
+    end
+
+    context "user not sign_in" do
+      before { put :take_money, params: { id: game_w_questions.id } }
+      it "return correct html status" do
+        expect(response.status).not_to eq(200)
+      end
+
+      it "correct redirect to new_user" do
+        expect(response).to redirect_to(new_user_session_path)
+      end
+
+      it "renders alert in flash" do
+        expect(flash[:alert]).to be
       end
     end
   end

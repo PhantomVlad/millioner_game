@@ -42,7 +42,6 @@ class GamesController < ApplicationController
 
       format.js {}
     end
-
   end
 
   def take_money
