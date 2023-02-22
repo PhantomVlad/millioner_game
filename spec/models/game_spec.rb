@@ -113,7 +113,7 @@ RSpec.describe Game, type: :model do
     end
 
     context "when answer isnt correct" do
-      let(:answer_key) { [:a, :b, :c, :d].grep_v(game_w_questions.current_game_question.correct_answer_key).first }
+      let(:answer_key) { %w[a b c d].grep_v(game_w_questions.current_game_question.correct_answer_key).sample }
 
       it "return finished true" do
         expect(game_w_questions.finished?).to be true

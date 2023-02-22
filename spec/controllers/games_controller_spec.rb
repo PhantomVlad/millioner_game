@@ -35,7 +35,7 @@ RSpec.describe GamesController, type: :controller do
     end
 
     context "user sign_in" do
-      before(:each) { sign_in user }
+      before { sign_in user }
       before { get :show, params: { id: game_w_questions.id } }
 
       it "game no finished" do
@@ -68,7 +68,7 @@ RSpec.describe GamesController, type: :controller do
 
   describe "#create" do
     context "user sign_in" do
-      before(:each) { sign_in user }
+      before { sign_in user }
 
       context "creating game" do
         before { generate_questions(15) }
@@ -125,26 +125,47 @@ RSpec.describe GamesController, type: :controller do
 
   describe "#answer" do
     context "user sign_in" do
-      before(:each) { sign_in user }
+      before { sign_in user }
 
-      it "return answers correct" do
-        put :answer, params: { id: game_w_questions.id, letter: game_w_questions.current_game_question.correct_answer_key }
-        game = assigns(:game)
+      context "user answers the question correct" do
+        before { put :answer, params: { id: game_w_questions.id, letter: game_w_questions.current_game_question.correct_answer_key } }
 
-        expect(game.finished?).to be false
-        expect(game.current_level).to be > 0
-        expect(response).to redirect_to(game_path(game))
-        expect(flash.empty?).to be true
+        it "return game no finished" do
+          expect(game.finished?).to be false
+        end
+
+        it "return current_level > 0" do
+          expect(game.current_level).to be > 0
+        end
+
+        it "correct redirect to game" do
+          expect(response).to redirect_to(game_path(game))
+        end
+
+        it "return flash empty" do
+          expect(flash.empty?).to be true
+        end
       end
 
-      it "return answer no correct" do
-        put :answer, params: { id: game_w_questions.id, letter: [:a, :b, :c, :d].grep_v(game_w_questions.current_game_question.correct_answer_key).first }
-        game = assigns(:game)
+      context "user answers the question no correct" do
+        before { put :answer, params: { id: game_w_questions.id, letter: %w[a b c d]
+                                                                           .grep_v(game_w_questions.current_game_question.correct_answer_key).sample } }
 
-        expect(game.finished?).to be true
-        expect(game.current_level).to be  0
-        expect(response).to redirect_to(user_path(user))
-        expect(flash.empty?).to be false
+        it "return game finished" do
+          expect(game.finished?).to be true
+        end
+
+        it "return current_level == 0" do
+          expect(game.current_level).to be 0
+        end
+
+        it "correct redirect to user" do
+          expect(response).to redirect_to(user_path(user))
+        end
+
+        it "return flash no empty" do
+          expect(flash.empty?).to be false
+        end
       end
     end
 
@@ -166,7 +187,7 @@ RSpec.describe GamesController, type: :controller do
 
   describe "#take_money" do
     context "user sign_in" do
-      before(:each) { sign_in user }
+      before { sign_in user }
 
       context "game isnt finished" do
         it "return correct params, redirect and flash" do
