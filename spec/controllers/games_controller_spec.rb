@@ -255,5 +255,39 @@ RSpec.describe GamesController, type: :controller do
         expect(response).to redirect_to(game_path(game))
       end
     end
+
+    context "user help fifty-fifty" do
+      before { sign_in user }
+
+      it "return fifty-fifty help used false" do
+        expect(game_w_questions.fifty_fifty_used).to be false
+      end
+
+      before { put :help, params: { id: game_w_questions.id, help_type: :fifty_fifty } }
+
+      it "return game no finished" do
+        expect(game.finished?).to be false
+      end
+
+      it "return game fifty-fifty help used" do
+        expect(game.fifty_fifty_used).to be true
+      end
+
+      it "return help hash have fifty-fifty help" do
+        expect(game.current_game_question.help_hash[:fifty_fifty]).to be
+      end
+
+      it "return size 2" do
+        expect(game.current_game_question.help_hash[:fifty_fifty].size).to eq 2
+      end
+
+      it "return help hash audience has a, b, c, d" do
+        expect(game.current_game_question.help_hash[:fifty_fifty]).to include(game_w_questions.current_game_question.correct_answer_key)
+      end
+
+      it "true redirect to game path" do
+        expect(response).to redirect_to(game_path(game))
+      end
+    end
   end
 end

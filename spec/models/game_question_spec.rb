@@ -74,7 +74,7 @@ RSpec.describe GameQuestion, type: :model do
     end
 
     context "correct fifty-fifty" do
-      before { game_question.add_fifty_fifty}
+      before { game_question.add_fifty_fifty }
 
       it "correct add fifty-fifty" do
         expect(game_question.help_hash).to include(:fifty_fifty)
