@@ -125,16 +125,20 @@ RSpec.describe GamesController, type: :controller do
 
   describe "#answer" do
     context "user sign_in" do
-      before { sign_in user }
+      before do
+        sign_in user
+
+        put :answer, params: { id: game_w_questions.id, letter: letter }
+      end
 
       context "user answers the question correct" do
-        before { put :answer, params: { id: game_w_questions.id, letter: game_w_questions.current_game_question.correct_answer_key } }
+        let(:letter) { game_w_questions.current_game_question.correct_answer_key }
 
         it "return game no finished" do
           expect(game.finished?).to be false
         end
 
-        it "return current_level > 0" do
+        it "return current_level += 1" do
           expect(game.current_level).to be > 0
         end
 
@@ -148,8 +152,7 @@ RSpec.describe GamesController, type: :controller do
       end
 
       context "user answers the question no correct" do
-        before { put :answer, params: { id: game_w_questions.id, letter: %w[a b c d]
-                                                                           .grep_v(game_w_questions.current_game_question.correct_answer_key).sample } }
+        let(:letter) { %w[a b c d].grep_v(game_w_questions.current_game_question.correct_answer_key).sample  }
 
         it "return game finished" do
           expect(game.finished?).to be true
@@ -218,6 +221,38 @@ RSpec.describe GamesController, type: :controller do
 
       it "renders alert in flash" do
         expect(flash[:alert]).to be
+      end
+    end
+  end
+
+  describe "#help" do
+    context "uses audience help" do
+      before { sign_in user }
+
+      it "return audience help used false" do
+        expect(game_w_questions.audience_help_used).to be false
+      end
+
+      before { put :help, params: { id: game_w_questions.id, help_type: :audience_help } }
+
+      it "return game no finished" do
+        expect(game.finished?).to be false
+      end
+
+      it "return game audience help used" do
+        expect(game.audience_help_used).to be true
+      end
+
+      it "return help hash have audience help" do
+        expect(game.current_game_question.help_hash[:audience_help]).to be
+      end
+
+      it "return help hash audience has a, b, c, d" do
+        expect(game.current_game_question.help_hash[:audience_help].keys).to contain_exactly('a', 'b', 'c', 'd')
+      end
+
+      it "true redirect to game path"do
+        expect(response).to redirect_to(game_path(game))
       end
     end
   end
