@@ -18,7 +18,7 @@ RSpec.describe 'users/_game', type: :view do
   end
 
   it 'renders game start time' do
-    expect(rendered).to match '09 окт., 10:00'
+    expect(rendered).to match '09 окт., 13:00'
   end
 
   it 'renders game current question' do
