@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.feature "USER creates game", type: :feature do
-  let(:user) { FactoryBot.create :user }
+  let(:user) { FactoryBot.create(:user) }
 
   let!(:questions) do
     (0..14).to_a.map do |i|
