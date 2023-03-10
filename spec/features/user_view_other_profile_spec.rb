@@ -28,7 +28,6 @@ RSpec.feature "USER view other profile", type: :feature do
   end
 
   scenario "success" do
-    debugger
     visit "/users/#{user_gamer.id}"
 
     expect(page).to have_content("Влад")
